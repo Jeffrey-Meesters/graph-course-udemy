@@ -2,7 +2,6 @@ import { GraphQLServer } from "graphql-yoga";
 // 5 Scalar types - String, Bool, Int, Float, ID
 
 // Demo data
-
 const users = [
   {
     id: 12,
@@ -47,11 +46,31 @@ const posts = [
   }
 ];
 
+const comments = [
+  {
+    id: 2,
+    text: "Hi there, nicely written!"
+  },
+  {
+    id: 3,
+    text: "Hi there, badly written!"
+  },
+  {
+    id: 4,
+    text: "Hi there, good written!"
+  },
+  {
+    id: 5,
+    text: "Hi there, oke written!"
+  }
+];
+
 // Type definitions (schema)
 const typeDefs = `
   type Query {
     users( query: String ): [User!]!
     posts( query: String ): [Post!]!
+    comments: [Comment!]!
     me: User!
     post: Post!
   }
@@ -65,11 +84,16 @@ const typeDefs = `
   }
 
   type Post {
-    id: ID
+    id: ID!
     title: String!
     body: String!
     published: Boolean!
     author: User!
+  }
+
+  type Comment {
+    id: ID!
+    text: String!
   }
 `;
 
@@ -98,6 +122,9 @@ const resolvers = {
           post.body.toLocaleLowerCase().includes(args.query.toLocaleLowerCase())
         );
       });
+    },
+    comments(parent, args, context, info) {
+      return comments;
     },
     me() {
       return {
