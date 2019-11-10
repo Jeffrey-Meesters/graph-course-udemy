@@ -23,10 +23,32 @@ const users = [
   }
 ];
 
+const posts = [
+  {
+    id: 11,
+    title: "Demo data",
+    body: "Data to use demo",
+    published: true
+  },
+  {
+    id: 12,
+    title: "I dont like this",
+    body: "Because it is to repetitive",
+    published: false
+  },
+  {
+    id: 13,
+    title: "Here is a titel",
+    body: "Sexy body",
+    published: true
+  }
+];
+
 // Type definitions (schema)
 const typeDefs = `
   type Query {
     users( query: String ): [User!]!
+    posts( query: String ): [Post!]!
     me: User!
     post: Post!
   }
@@ -56,6 +78,20 @@ const resolvers = {
 
       return users.filter(user => {
         return user.name.toLowerCase().includes(args.query.toLowerCase());
+      });
+    },
+    posts(parent, args, context, info) {
+      if (!args.query) {
+        return posts;
+      }
+
+      return posts.filter(post => {
+        return (
+          post.title
+            .toLocaleLowerCase()
+            .includes(args.query.toLocaleLowerCase()) ||
+          post.body.toLocaleLowerCase().includes(args.query.toLocaleLowerCase())
+        );
       });
     },
     me() {
