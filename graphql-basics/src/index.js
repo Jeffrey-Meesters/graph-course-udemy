@@ -50,22 +50,26 @@ const comments = [
   {
     id: 2,
     text: "Hi there, nicely written!",
-    author: 12
+    author: 12,
+    post: 11
   },
   {
     id: 3,
     text: "Hi there, badly written!",
-    author: 13
+    author: 13,
+    post: 12
   },
   {
     id: 4,
     text: "Hi there, good written!",
-    author: 14
+    author: 14,
+    post: 13
   },
   {
     id: 5,
     text: "Hi there, oke written!",
-    author: 12
+    author: 12,
+    post: 11
   }
 ];
 
@@ -94,12 +98,14 @@ const typeDefs = `
     body: String!
     published: Boolean!
     author: User!
+    comments: [Comment!]!
   }
 
   type Comment {
     id: ID!
     text: String!
     author: User!
+    post: Post!
   }
 `;
 
@@ -154,6 +160,11 @@ const resolvers = {
       return users.find(user => {
         return user.id === parent.author;
       });
+    },
+    comments(parent, args, context, info) {
+      return comments.filter(comment => {
+        return comment.post === parent.id;
+      });
     }
   },
   User: {
@@ -172,6 +183,11 @@ const resolvers = {
     author(parent, args, context, info) {
       return users.find(user => {
         return user.id === parent.author;
+      });
+    },
+    post(parent, args, context, info) {
+      return posts.find(post => {
+        return post.id === parent.post;
       });
     }
   }
