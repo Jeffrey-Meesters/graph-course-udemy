@@ -5,6 +5,7 @@ import { GraphQLServer } from "graphql-yoga";
 const typeDefs = `
   type Query {
     me: User!
+    post: Post!
   }
 
   type User {
@@ -12,6 +13,13 @@ const typeDefs = `
     name: String!
     email: String!
     age: Int
+  }
+
+  type Post {
+    id: ID
+    title: String!
+    body: String!
+    published: Boolean!
   }
 `;
 
@@ -24,6 +32,14 @@ const resolvers = {
         name: "jeffrey",
         email: "my@email.com",
         age: 30
+      };
+    },
+    post() {
+      return {
+        id: 12,
+        title: "My first post!",
+        body: "I'm writing a post to test my graphQL queries",
+        published: true
       };
     }
   }
