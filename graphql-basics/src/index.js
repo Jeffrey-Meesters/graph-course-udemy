@@ -49,19 +49,23 @@ const posts = [
 const comments = [
   {
     id: 2,
-    text: "Hi there, nicely written!"
+    text: "Hi there, nicely written!",
+    author: 12
   },
   {
     id: 3,
-    text: "Hi there, badly written!"
+    text: "Hi there, badly written!",
+    author: 13
   },
   {
     id: 4,
-    text: "Hi there, good written!"
+    text: "Hi there, good written!",
+    author: 14
   },
   {
     id: 5,
-    text: "Hi there, oke written!"
+    text: "Hi there, oke written!",
+    author: 12
   }
 ];
 
@@ -81,6 +85,7 @@ const typeDefs = `
     email: String!
     age: Int
     posts: [Post!]!
+    comments: [Comment!]!
   }
 
   type Post {
@@ -94,6 +99,7 @@ const typeDefs = `
   type Comment {
     id: ID!
     text: String!
+    author: User!
   }
 `;
 
@@ -154,6 +160,18 @@ const resolvers = {
     posts(parent, args, context, info) {
       return posts.filter(post => {
         return post.author === parent.id;
+      });
+    },
+    comments(parent, args, context, info) {
+      return comments.filter(comment => {
+        return comment.author === parent.id;
+      });
+    }
+  },
+  Comment: {
+    author(parent, args, context, info) {
+      return users.find(user => {
+        return user.id === parent.author;
       });
     }
   }
