@@ -28,19 +28,22 @@ const posts = [
     id: 11,
     title: "Demo data",
     body: "Data to use demo",
-    published: true
+    published: true,
+    author: 14
   },
   {
     id: 12,
     title: "I dont like this",
     body: "Because it is to repetitive",
-    published: false
+    published: false,
+    author: 14
   },
   {
     id: 13,
     title: "Here is a titel",
     body: "Sexy body",
-    published: true
+    published: true,
+    author: 12
   }
 ];
 
@@ -65,6 +68,7 @@ const typeDefs = `
     title: String!
     body: String!
     published: Boolean!
+    author: User!
   }
 `;
 
@@ -109,6 +113,13 @@ const resolvers = {
         body: "I'm writing a post to test my graphQL queries",
         published: true
       };
+    }
+  },
+  Post: {
+    author(parent, args, context, info) {
+      return users.find(user => {
+        return user.id === parent.author;
+      });
     }
   }
 };
