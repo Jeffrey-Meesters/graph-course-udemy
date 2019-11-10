@@ -4,8 +4,5 @@ console.log(message);
 console.log(currentLocation);
 greetMe("you");
 
-const outcome = addNumbers(3, 4);
-console.log(outcome);
-
-const uitslag = subtract(4, 3);
-console.log(uitslag);
+console.log(addNumbers(3, 4));
+console.log(subtract(4, 3));
