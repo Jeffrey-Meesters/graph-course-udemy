@@ -1,4 +1,5 @@
 import { GraphQLServer } from "graphql-yoga";
+import uuid from "uuid/v4";
 // 5 Scalar types - String, Bool, Int, Float, ID
 
 // Demo data
@@ -92,6 +93,11 @@ const typeDefs = `
     comments: [Comment!]!
   }
 
+  type Mutation {
+    createUser(name: String!, email: String!, age: Int): User!
+    createPost(title: String!, body: String!, published: Boolean!, author: ID!): Post!
+  }
+
   type Post {
     id: ID!
     title: String!
@@ -153,6 +159,44 @@ const resolvers = {
         body: "I'm writing a post to test my graphQL queries",
         published: true
       };
+    }
+  },
+  Mutation: {
+    createUser(parent, args, context, info) {
+      const emailTaken = users.some(user => user.email === args.email);
+      if (emailTaken) {
+        throw new Error("Email taken");
+      }
+
+      const newUser = {
+        id: uuid(),
+        name: args.name,
+        email: args.email,
+        age: args.age
+      };
+
+      users.push(newUser);
+
+      return newUser;
+    },
+    createPost(parent, args, context, info) {
+      const userExists = users.some(user => user.id === args.author);
+
+      if (!userExists) {
+        throw new Error("User not found");
+      }
+
+      const newPost = {
+        id: uuid(),
+        title: args.title,
+        body: args.body,
+        published: args.published,
+        author: args.author
+      };
+
+      posts.push(newPost);
+
+      return newPost;
     }
   },
   Post: {
