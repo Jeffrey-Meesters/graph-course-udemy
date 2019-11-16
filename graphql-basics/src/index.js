@@ -6,18 +6,18 @@ import { addErrorLoggingToSchema } from "graphql-tools";
 // Demo data
 const users = [
   {
-    id: 12,
+    id: "12",
     name: "Jeffrey",
     email: "owruhgf@sef.com"
   },
   {
-    id: 13,
+    id: "13",
     name: "Jeff",
     email: "owfewruhgf@sef.com",
     age: 50
   },
   {
-    id: 14,
+    id: "14",
     name: "Rey",
     email: "owruhgf@sef.com",
     age: 99
@@ -26,52 +26,52 @@ const users = [
 
 const posts = [
   {
-    id: 11,
+    id: "11",
     title: "Demo data",
     body: "Data to use demo",
     published: true,
-    author: 14
+    author: "14"
   },
   {
-    id: 12,
+    id: "12",
     title: "I dont like this",
     body: "Because it is to repetitive",
     published: false,
-    author: 14
+    author: "14"
   },
   {
-    id: 13,
+    id: "13",
     title: "Here is a titel",
     body: "Sexy body",
     published: true,
-    author: 12
+    author: "12"
   }
 ];
 
 const comments = [
   {
-    id: 2,
+    id: "2",
     text: "Hi there, nicely written!",
-    author: 12,
-    post: 11
+    author: "12",
+    post: "11"
   },
   {
-    id: 3,
+    id: "3",
     text: "Hi there, badly written!",
-    author: 13,
-    post: 12
+    author: "13",
+    post: "12"
   },
   {
-    id: 4,
+    id: "4",
     text: "Hi there, good written!",
-    author: 14,
-    post: 13
+    author: "14",
+    post: "13"
   },
   {
-    id: 5,
+    id: "5",
     text: "Hi there, oke written!",
-    author: 12,
-    post: 11
+    author: "12",
+    post: "11"
   }
 ];
 
@@ -85,6 +85,29 @@ const typeDefs = `
     post: Post!
   }
 
+  type Mutation {
+    createUser(data: CreateUserInput): User!
+    createPost(data: CreatePostInput): Post!
+    createComment(data: CreateCommentInput): Comment!
+  }
+
+  input CreateUserInput {
+    name: String!,
+    email: String!,
+    age: Int
+  }
+  input CreatePostInput {
+    title: String!,
+    body: String!,
+    published: Boolean!,
+    author: ID!
+  }
+  input CreateCommentInput {
+    text: String!,
+    author: ID!,
+    post: ID!
+  }
+
   type User {
     id: ID!
     name: String!
@@ -92,12 +115,6 @@ const typeDefs = `
     age: Int
     posts: [Post!]!
     comments: [Comment!]!
-  }
-
-  type Mutation {
-    createUser(name: String!, email: String!, age: Int): User!
-    createPost(title: String!, body: String!, published: Boolean!, author: ID!): Post!
-    createComment(text: String!, author: ID!, post: ID!): Comment!
   }
 
   type Post {
@@ -165,14 +182,14 @@ const resolvers = {
   },
   Mutation: {
     createUser(parent, args, context, info) {
-      const emailTaken = users.some(user => user.email === args.email);
+      const emailTaken = users.some(user => user.email === args.data.email);
       if (emailTaken) {
         throw new Error("Email taken");
       }
 
       const newUser = {
         id: uuid(),
-        ...args
+        ...args.data
       };
 
       users.push(newUser);
@@ -180,7 +197,7 @@ const resolvers = {
       return newUser;
     },
     createPost(parent, args, context, info) {
-      const userExists = users.some(user => user.id === args.author);
+      const userExists = users.some(user => user.id === args.data.author);
 
       if (!userExists) {
         throw new Error("User not found");
@@ -188,7 +205,7 @@ const resolvers = {
 
       const newPost = {
         id: uuid(),
-        ...args
+        ...args.data
       };
 
       posts.push(newPost);
@@ -196,9 +213,9 @@ const resolvers = {
       return newPost;
     },
     createComment(parent, args, context, info) {
-      const userExists = users.some(user => user.id === args.author);
+      const userExists = users.some(user => user.id === args.data.author);
       const postExists = posts.some(
-        post => post.id === args.post && post.published
+        post => post.id === args.data.post && post.published
       );
 
       if (!userExists && !postExists) {
@@ -215,7 +232,7 @@ const resolvers = {
 
       const newComment = {
         id: uuid(),
-        ...args
+        ...args.data
       };
 
       comments.push(newComment);
