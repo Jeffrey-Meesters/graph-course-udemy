@@ -1,5 +1,6 @@
 import { GraphQLServer } from "graphql-yoga";
 import uuid from "uuid/v4";
+import { addErrorLoggingToSchema } from "graphql-tools";
 // 5 Scalar types - String, Bool, Int, Float, ID
 
 // Demo data
@@ -96,6 +97,7 @@ const typeDefs = `
   type Mutation {
     createUser(name: String!, email: String!, age: Int): User!
     createPost(title: String!, body: String!, published: Boolean!, author: ID!): Post!
+    createComment(text: String!, author: ID!, post: ID!): Comment!
   }
 
   type Post {
@@ -197,6 +199,33 @@ const resolvers = {
       posts.push(newPost);
 
       return newPost;
+    },
+    createComment(parent, args, context, info) {
+      const userExists = users.some(user => user.id === args.author);
+      const postExists = posts.some(post => post.id === args.post);
+
+      if (!userExists && !postExists) {
+        throw new Error("User and Post not found");
+      }
+
+      if (!userExists) {
+        throw new Error("User not found");
+      }
+
+      if (!postExists) {
+        throw new Error("Post not found");
+      }
+
+      const newComment = {
+        id: uuid(),
+        text: args.text,
+        post: args.post,
+        author: args.author
+      };
+
+      comments.push(newComment);
+
+      return newComment;
     }
   },
   Post: {
