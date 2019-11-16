@@ -4,7 +4,7 @@ import { addErrorLoggingToSchema } from "graphql-tools";
 // 5 Scalar types - String, Bool, Int, Float, ID
 
 // Demo data
-const users = [
+let users = [
   {
     id: "12",
     name: "Jeffrey",
@@ -24,7 +24,7 @@ const users = [
   }
 ];
 
-const posts = [
+let posts = [
   {
     id: "11",
     title: "Demo data",
@@ -48,7 +48,7 @@ const posts = [
   }
 ];
 
-const comments = [
+let comments = [
   {
     id: "2",
     text: "Hi there, nicely written!",
@@ -86,9 +86,10 @@ const typeDefs = `
   }
 
   type Mutation {
-    createUser(data: CreateUserInput): User!
-    createPost(data: CreatePostInput): Post!
-    createComment(data: CreateCommentInput): Comment!
+    createUser(data: CreateUserInput!): User!
+    deleteUser(id: ID!): User!
+    createPost(data: CreatePostInput!): Post!
+    createComment(data: CreateCommentInput!): Comment!
   }
 
   input CreateUserInput {
@@ -195,6 +196,33 @@ const resolvers = {
       users.push(newUser);
 
       return newUser;
+    },
+    deleteUser(parent, args, context, info) {
+      const userIndex = users.findIndex(user => user.id === args.id);
+
+      if (!~userIndex) {
+        throw new Error("User not found");
+      }
+
+      const removedUser = users.splice(userIndex, 1);
+
+      // filter off the post that matches the author id
+      posts = posts.filter(post => {
+        const match = post.author === args.id;
+
+        if (match) {
+          //  filter off the comments that matches these post
+          comments = comments.filter(comment => comment.post !== post.id);
+        }
+
+        return !match;
+      });
+
+      // Remove comments created by this user
+      comments = comments.filter(comment => comment.author !== args.id);
+
+      // removedUser is an array with 1 object
+      return removedUser[0];
     },
     createPost(parent, args, context, info) {
       const userExists = users.some(user => user.id === args.data.author);
