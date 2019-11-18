@@ -26,6 +26,11 @@ const Subscription = {
 
       return pubsub.asyncIterator(`comment_${postId}`);
     }
+  },
+  post: {
+    subscribe(parent, args, { pubsub }, info) {
+      return pubsub.asyncIterator("post");
+    }
   }
 };
 
