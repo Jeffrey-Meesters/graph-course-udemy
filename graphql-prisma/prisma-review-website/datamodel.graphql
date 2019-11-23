@@ -1,0 +1,5 @@
+# SET_NULL (default) - CASCADE
+
+type User {
+  id: ID! @id @unique
+}
