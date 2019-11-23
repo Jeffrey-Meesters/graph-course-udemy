@@ -11,6 +11,6 @@ const prisma = new Prisma({
 // prisma.subscription
 // prisma.exists
 
-prisma.query.users(null, "{ id name email }").then(data => {
-  console.log(data);
+prisma.query.users(null, "{ id name email posts { id title } }").then(data => {
+  console.log(JSON.stringify(data, undefined, 2));
 });
