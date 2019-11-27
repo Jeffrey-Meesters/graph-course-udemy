@@ -1,14 +1,5 @@
 const User = {
-  posts(parent, args, { db }, info) {
-    return db.posts.filter(post => {
-      return post.author === parent.id;
-    });
-  },
-  comments(parent, args, { db }, info) {
-    return db.comments.filter(comment => {
-      return comment.author === parent.id;
-    });
-  }
+  // prisma fetches relational data so no need to create this ourselves
 };
 
 export { User as default };
