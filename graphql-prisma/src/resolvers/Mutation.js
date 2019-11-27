@@ -1,20 +1,14 @@
 import uuid from "uuid/v4";
 
 const Mutation = {
-  createUser(parent, args, { db }, info) {
-    const emailTaken = db.users.some(user => user.email === args.data.email);
+  async createUser(parent, args, { prisma }, info) {
+    const emailTaken = await prisma.exists.User({ email: args.data.email });
+
     if (emailTaken) {
       throw new Error("Email taken");
     }
 
-    const newUser = {
-      id: uuid(),
-      ...args.data
-    };
-
-    db.users.push(newUser);
-
-    return newUser;
+    return prisma.mutation.createUser({ data: args.data }, info);
   },
   updateUser(parent, args, { db }, info) {
     const { id, data } = args;
@@ -44,32 +38,14 @@ const Mutation = {
 
     return user;
   },
-  deleteUser(parent, args, { db }, info) {
-    const userIndex = db.users.findIndex(user => user.id === args.id);
+  async deleteUser(parent, args, { prisma }, info) {
+    const exists = await prisma.exists.User({ id: args.id });
 
-    if (!~userIndex) {
+    if (!exists) {
       throw new Error("User not found");
     }
 
-    const removedUser = db.users.splice(userIndex, 1);
-
-    // filter off the post that matches the author id
-    db.posts = db.posts.filter(post => {
-      const match = post.author === args.id;
-
-      if (match) {
-        //  filter off the comments that matches these post
-        db.comments = db.comments.filter(comment => comment.post !== post.id);
-      }
-
-      return !match;
-    });
-
-    // Remove comments created by this user
-    db.comments = db.comments.filter(comment => comment.author !== args.id);
-
-    // removedUser is an array with 1 object
-    return removedUser[0];
+    return prisma.mutation.deleteUser({ where: { id: args.id } }, info);
   },
   createPost(parent, args, { db, pubsub }, info) {
     const userExists = db.users.some(user => user.id === args.data.author);
