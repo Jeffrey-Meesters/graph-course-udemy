@@ -83,34 +83,40 @@ const Mutation = {
 
     return post;
   },
-  deletePost(parent, args, { db, pubsub }, info) {
-    const postExists = db.posts.some(post => post.id === args.id);
+  async deletePost(parent, args, { prisma, pubsub }, info) {
+    return prisma.mutation.deletePost(
+      {
+        where: { id: args.id }
+      },
+      info
+    );
+    // const postExists = db.posts.some(post => post.id === args.id);
 
-    if (!postExists) {
-      throw new Error("Post not found");
-    }
+    // if (!postExists) {
+    //   throw new Error("Post not found");
+    // }
 
-    let postToBeDeleted = {};
-    db.posts = db.posts.filter(post => {
-      if (post.id === args.id) {
-        postToBeDeleted = post;
-      }
+    // let postToBeDeleted = {};
+    // db.posts = db.posts.filter(post => {
+    //   if (post.id === args.id) {
+    //     postToBeDeleted = post;
+    //   }
 
-      return post.id !== args.id;
-    });
+    //   return post.id !== args.id;
+    // });
 
-    db.comments = db.comments.filter(comment => comment.post !== args.id);
+    // db.comments = db.comments.filter(comment => comment.post !== args.id);
 
-    if (postToBeDeleted.published) {
-      pubsub.publish("post", {
-        post: {
-          mutation: "DELETED",
-          data: postToBeDeleted
-        }
-      });
-    }
+    // if (postToBeDeleted.published) {
+    //   pubsub.publish("post", {
+    //     post: {
+    //       mutation: "DELETED",
+    //       data: postToBeDeleted
+    //     }
+    //   });
+    // }
 
-    return postToBeDeleted;
+    // return postToBeDeleted;
   },
   createComment(parent, args, { db, pubsub }, info) {
     const userExists = db.users.some(user => user.id === args.data.author);
