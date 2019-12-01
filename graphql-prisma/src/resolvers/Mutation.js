@@ -1,13 +1,22 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import getUserId from "../utils/getUserId";
 
 const verify = async (hash, password) => {
   return bcrypt.compare(password, hash);
 };
 
 const Mutation = {
-  async loginUser(parent, { data }, { prisma }, info) {
-    const user = prisma.query.user({ where: { email: data.email } });
+  async loginUser(parent, {
+    data
+  }, {
+    prisma
+  }, info) {
+    const user = prisma.query.user({
+      where: {
+        email: data.email
+      }
+    });
 
     if (!user) {
       throw new Error("User not found");
@@ -21,8 +30,7 @@ const Mutation = {
 
     return {
       user,
-      token: jwt.sign(
-        {
+      token: jwt.sign({
           userId: user.id
         },
         "secret"
@@ -30,7 +38,9 @@ const Mutation = {
     };
   },
 
-  async createUser(parent, args, { prisma }, info) {
+  async createUser(parent, args, {
+    prisma
+  }, info) {
     if (args.data.password.length < 8) {
       throw new Error("Password must be 8 characters or longer");
     }
@@ -39,21 +49,23 @@ const Mutation = {
 
     args.data.password = hash;
 
-    const user = await prisma.mutation.createUser({ data: args.data });
+    const user = await prisma.mutation.createUser({
+      data: args.data
+    });
 
     return {
       user,
-      token: jwt.sign(
-        {
+      token: jwt.sign({
           userId: user.id
         },
         "secret"
       )
     };
   },
-  updateUser(parent, args, { prisma }, info) {
-    return prisma.mutation.updateUser(
-      {
+  updateUser(parent, args, {
+    prisma
+  }, info) {
+    return prisma.mutation.updateUser({
         where: {
           id: args.id
         },
@@ -62,19 +74,27 @@ const Mutation = {
       info
     );
   },
-  deleteUser(parent, args, { prisma }, info) {
-    return prisma.mutation.deleteUser({ where: { id: args.id } }, info);
+  deleteUser(parent, args, {
+    prisma
+  }, info) {
+    return prisma.mutation.deleteUser({
+      where: {
+        id: args.id
+      }
+    }, info);
   },
-  createPost(parent, args, { prisma }, info) {
-    const authorId = args.data.author;
-    delete args.data.author;
-    return prisma.mutation.createPost(
-      {
+  createPost(parent, args, {
+    prisma,
+    request
+  }, info) {
+    const userId = getUserId(request);
+
+    return prisma.mutation.createPost({
         data: {
           ...args.data,
           author: {
             connect: {
-              id: authorId
+              id: userId
             }
           }
         }
@@ -82,9 +102,10 @@ const Mutation = {
       info
     );
   },
-  updatePost(parent, args, { prisma }, info) {
-    return prisma.mutation.updatePost(
-      {
+  updatePost(parent, args, {
+    prisma
+  }, info) {
+    return prisma.mutation.updatePost({
         data: args.data,
         where: {
           id: args.id
@@ -93,17 +114,21 @@ const Mutation = {
       info
     );
   },
-  deletePost(parent, args, { prisma }, info) {
-    return prisma.mutation.deletePost(
-      {
-        where: { id: args.id }
+  deletePost(parent, args, {
+    prisma
+  }, info) {
+    return prisma.mutation.deletePost({
+        where: {
+          id: args.id
+        }
       },
       info
     );
   },
-  createComment(parent, args, { prisma }, info) {
-    return prisma.mutation.createComment(
-      {
+  createComment(parent, args, {
+    prisma
+  }, info) {
+    return prisma.mutation.createComment({
         data: {
           text: args.data.text,
           author: {
@@ -121,9 +146,10 @@ const Mutation = {
       info
     );
   },
-  updateComment(parent, args, { prisma }, info) {
-    return prisma.mutation.updateComment(
-      {
+  updateComment(parent, args, {
+    prisma
+  }, info) {
+    return prisma.mutation.updateComment({
         where: {
           id: args.id
         },
@@ -132,9 +158,10 @@ const Mutation = {
       info
     );
   },
-  deleteComment(parent, args, { prisma }, info) {
-    return prisma.mutation.deleteComment(
-      {
+  deleteComment(parent, args, {
+    prisma
+  }, info) {
+    return prisma.mutation.deleteComment({
         where: {
           id: args.id
         }
@@ -144,4 +171,7 @@ const Mutation = {
   }
 };
 
-export { Mutation as default };
+export {
+  Mutation as
+  default
+};
