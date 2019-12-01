@@ -1,7 +1,35 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+const verify = async (hash, password) => {
+  return bcrypt.compare(password, hash);
+};
+
 const Mutation = {
+  async loginUser(parent, { data }, { prisma }, info) {
+    const user = prisma.query.user({ where: { email: data.email } });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const verified = await verify(user.password, data.password);
+
+    if (!verified) {
+      throw new Error("Unable to login");
+    }
+
+    return {
+      user,
+      token: jwt.sign(
+        {
+          userId: user.id
+        },
+        "secret"
+      )
+    };
+  },
+
   async createUser(parent, args, { prisma }, info) {
     if (args.data.password.length < 8) {
       throw new Error("Password must be 8 characters or longer");
