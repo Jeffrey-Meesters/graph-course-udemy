@@ -4,7 +4,10 @@ const Query = {
   users(parent, args, {
     prisma
   }, info) {
-    const opArgs = {};
+    const opArgs = {
+      first: args.first,
+      skip: args.skip
+    };
 
     if (args.query) {
       opArgs.where = {
@@ -24,6 +27,8 @@ const Query = {
   }, info) {
     const userId = getUserId(request);
     const opArgs = {
+      first: args.first,
+      skip: args.skip,
       where: {
         author: {
           id: userId
@@ -48,6 +53,8 @@ const Query = {
     prisma
   }, info) {
     const opArgs = {
+      first: args.first,
+      skip: args.skip,
       where: {
         published: true
       }
@@ -68,7 +75,11 @@ const Query = {
   comments(parent, args, {
     prisma
   }, info) {
-    return prisma.query.comments(null, info);
+    const opArgs = {
+      first: args.first,
+      skip: args.skip
+    };
+    return prisma.query.comments(opArgs, info);
   },
   me(parent, args, {
     prisma,
