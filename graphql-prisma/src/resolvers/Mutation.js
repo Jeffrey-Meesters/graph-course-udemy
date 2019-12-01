@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import getUserId from "../utils/getUserId";
-import signJwt from "../utils/generateToken"
+import signJwt from "../utils/generateToken";
+import hashPassword from "../utils/hashPassword";
 
 const verify = async (hash, password) => {
   return bcrypt.compare(password, hash);
@@ -37,11 +38,7 @@ const Mutation = {
   async createUser(parent, args, {
     prisma
   }, info) {
-    if (args.data.password.length < 8) {
-      throw new Error("Password must be 8 characters or longer");
-    }
-
-    const hash = await bcrypt.hash(data.args.password, 10);
+    const hash = await hashPassword(args.data.password, 10);
 
     args.data.password = hash;
 
@@ -58,6 +55,10 @@ const Mutation = {
     prisma
   }, info) {
     const userId = getUserId(request);
+
+    if (typeof args.data.password === 'string') {
+      args.data.password = await hashPassword(args.data.password, 10);
+    }
 
     return prisma.mutation.updateUser({
         where: {

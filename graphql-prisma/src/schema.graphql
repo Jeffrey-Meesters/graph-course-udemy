@@ -43,6 +43,7 @@ input CreateUserInput {
 input updatUserInput {
   name: String
   email: String
+  password: String
 }
 
 input CreatePostInput {
