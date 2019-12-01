@@ -1,11 +1,14 @@
+import getUserId from "../utils/getUserId"
+
 const Query = {
-  users(parent, args, { prisma }, info) {
+  users(parent, args, {
+    prisma
+  }, info) {
     const opArgs = {};
 
     if (args.query) {
       opArgs.where = {
-        OR: [
-          {
+        OR: [{
             name_contains: args.query
           },
           {
@@ -18,13 +21,14 @@ const Query = {
     // info holds the query given by the client
     return prisma.query.users(opArgs, info);
   },
-  posts(parent, args, { prisma }, info) {
+  posts(parent, args, {
+    prisma
+  }, info) {
     const opArgs = {};
 
     if (args.query) {
       opArgs.where = {
-        OR: [
-          {
+        OR: [{
             title_contains: args.query
           },
           {
@@ -36,25 +40,51 @@ const Query = {
 
     return prisma.query.posts(opArgs, info);
   },
-  comments(parent, args, { prisma }, info) {
+  comments(parent, args, {
+    prisma
+  }, info) {
     return prisma.query.comments(null, info);
   },
-  me() {
-    return {
-      id: 12,
-      name: "jeffrey",
-      email: "my@email.com",
-      age: 30
-    };
+  me(parent, args, {
+    prisma,
+    request
+  }, info) {
+    const userId = getUserId(request);
+
+    return prisma.query.user({
+      where: {
+        id: userId
+      }
+    })
   },
-  post() {
-    return {
-      id: 12,
-      title: "My first post!",
-      body: "I'm writing a post to test my graphQL queries",
-      published: true
-    };
+  async post(parent, args, {
+    prisma,
+    request
+  }, info) {
+    const userId = getUserId(request, false);
+
+    const posts = await prisma.query.posts({
+      where: {
+        id: args.id,
+        OR: [{
+          published: true
+        }, {
+          author: {
+            id: userId
+          }
+        }]
+      }
+    }, info);
+
+    if (!posts.length) {
+      throw new Error("Post not found")
+    }
+
+    return posts[0];
   }
 };
 
-export { Query as default };
+export {
+  Query as
+  default
+};
