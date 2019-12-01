@@ -51,7 +51,7 @@ const Mutation = {
       token: signJwt(user.id)
     };
   },
-  updateUser(parent, args, {
+  async updateUser(parent, args, {
     prisma
   }, info) {
     const userId = getUserId(request);
