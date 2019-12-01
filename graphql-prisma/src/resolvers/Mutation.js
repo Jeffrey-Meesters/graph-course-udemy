@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import getUserId from "../utils/getUserId";
+import signJwt from "../utils/generateToken"
 
 const verify = async (hash, password) => {
   return bcrypt.compare(password, hash);
@@ -30,11 +30,7 @@ const Mutation = {
 
     return {
       user,
-      token: jwt.sign({
-          userId: user.id
-        },
-        "secret"
-      )
+      token: signJwt(user.id)
     };
   },
 
@@ -55,11 +51,7 @@ const Mutation = {
 
     return {
       user,
-      token: jwt.sign({
-          userId: user.id
-        },
-        "secret"
-      )
+      token: signJwt(user.id)
     };
   },
   updateUser(parent, args, {
