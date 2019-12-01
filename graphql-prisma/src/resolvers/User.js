@@ -9,13 +9,31 @@ const User = {
     resolve(parent, args, {
       request
     }, info) {
-      const userId = getd(request, false);
+      const userId = getUserId(request, false);
 
       if (userId && userId === parent.id) {
         return parent.email;
       }
 
       return null;
+    }
+  },
+
+  posts: {
+    fragment: "fragment userId on User { id }",
+    resolve(parent, args, {
+      prisma,
+      request
+    }, info) {
+
+      return prisma.request.posts({
+        where: {
+          published: true,
+          author: {
+            id: parent.id
+          }
+        }
+      })
     }
   }
 };

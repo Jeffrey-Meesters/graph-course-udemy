@@ -23,16 +23,6 @@ type Mutation {
   deleteComment(id: ID!): Comment!
 }
 
-type Subscription {
-  comment(postId: ID!): CommentSubscriptionPayload!
-  post: PostSubscriptionPayload!
-}
-
-type AuthPayload {
-  token: String!
-  user: User!
-}
-
 input LoginInput {
   email: String!
   password: String!
@@ -70,12 +60,22 @@ input CreateCommentInput {
   post: ID!
 }
 
+type Subscription {
+  comment(postId: ID!): CommentSubscriptionPayload!
+  post: PostSubscriptionPayload!
+}
+
+type AuthPayload {
+  token: String!
+  user: User!
+}
+
 type User {
   id: ID!
   name: String!
   email: String
   password: String!
-  posts: [Post!]!
+  posts: [Post]!
   comments: [Comment!]!
 }
 
