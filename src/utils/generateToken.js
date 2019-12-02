@@ -5,7 +5,7 @@ const signJwt = (userId) => {
   return jwt.sign({
       userId
     },
-    "secret", {
+    process.env.JWT_SECRET, {
       expiresIn: "12h"
     }
   )
