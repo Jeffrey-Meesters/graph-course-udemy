@@ -4,6 +4,7 @@ import signJwt from "../utils/generateToken";
 import hashPassword from "../utils/hashPassword";
 
 const verify = async (hash, password) => {
+  console.log(22, password, hash)
   return bcrypt.compare(password, hash);
 };
 
@@ -13,7 +14,7 @@ const Mutation = {
   }, {
     prisma
   }, info) {
-    const user = prisma.query.user({
+    const user = await prisma.query.user({
       where: {
         email: data.email
       }
@@ -22,7 +23,7 @@ const Mutation = {
     if (!user) {
       throw new Error("User not found");
     }
-
+    console.log(111, user)
     const verified = await verify(user.password, data.password);
 
     if (!verified) {
