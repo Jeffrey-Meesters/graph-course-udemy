@@ -1,13 +1,9 @@
-import {
-  Prisma
-} from "prisma-binding";
-import {
-  fragmentReplacements
-} from "./resolvers/index";
+import { Prisma } from "prisma-binding";
+import { fragmentReplacements } from "./resolvers/index";
 
 const prisma = new Prisma({
   typeDefs: "src/generated/prisma.graphql",
-  endpoint: "http://localhost:4466",
+  endpoint: process.env.PRISMA_ENDPOINT,
   fragmentReplacements,
   secret: ""
 });
@@ -17,10 +13,7 @@ const prisma = new Prisma({
 // prisma.subscription
 // prisma.exists
 
-export {
-  prisma as
-  default
-};
+export { prisma as default };
 
 // const createPostForUser = async (authorId, data) => {
 //   const exists = await prisma.exists.User({ id: authorId });
