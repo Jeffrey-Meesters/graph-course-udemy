@@ -1,0 +1,6 @@
+node_modules/
+docker-compose.yml
+prisma.yml
+.DS_Store
+config/
+dist/
