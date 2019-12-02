@@ -1,12 +1,7 @@
-import {
-  GraphQLServer,
-  PubSub
-} from "graphql-yoga";
+import "@babel/polyfill";
+import { GraphQLServer, PubSub } from "graphql-yoga";
 import db from "./db";
-import {
-  resolvers,
-  fragmentReplacements
-} from "./resolvers/index"
+import { resolvers, fragmentReplacements } from "./resolvers/index";
 import prisma from "./prisma";
 
 const pubsub = new PubSub();
@@ -21,10 +16,15 @@ const server = new GraphQLServer({
       pubsub,
       prisma,
       request
-    }
+    };
   }
 });
 
-server.start(() => {
-  console.log("Server is running", `http://localhost:${server.options.port}`);
-});
+server.start(
+  {
+    port: process.env.PORT || 4000
+  },
+  () => {
+    console.log("Server is running", `http://localhost:${server.options.port}`);
+  }
+);
