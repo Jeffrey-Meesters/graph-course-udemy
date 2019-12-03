@@ -13,7 +13,7 @@ const Mutation = {
   }, {
     prisma
   }, info) {
-    const user = prisma.query.user({
+    const user = await prisma.query.user({
       where: {
         email: data.email
       }
