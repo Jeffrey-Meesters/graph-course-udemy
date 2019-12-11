@@ -103,26 +103,23 @@ const Mutation = {
     prisma,
     request
   }, info) {
-    const userId = getUserId(request);
-    const exists = prisma.exists = await prisma.exists.Post({
-      where: {
-        id: args.id,
-        author: {
-          id: userId,
-        }
+    const userId = getUserId(request)
+    const postExists = await prisma.exists.Post({
+      id: args.id,
+      author: {
+        id: userId
       }
     })
-
-    const isPublished = prisma.exists.Post({
+    const isPublished = await prisma.exists.Post({
       id: args.id,
       published: true
     })
 
-    if (!exists) {
-      throw new Error("Unable to update post")
+    if (!postExists) {
+      throw new Error('Unable to update post')
     }
 
-    if (isPublished && !args.data.published) {
+    if (isPublished && args.data.published === false) {
       await prisma.mutation.deleteManyComments({
         where: {
           post: {
@@ -133,39 +130,33 @@ const Mutation = {
     }
 
     return prisma.mutation.updatePost({
-        data: args.data,
-        where: {
-          id: args.id
-        }
+      where: {
+        id: args.id
       },
-      info
-    );
+      data: args.data
+    }, info)
   },
   async deletePost(parent, args, {
     prisma,
     request
   }, info) {
-    const userId = getUserId(request);
-    const exists = prisma.exists = await prisma.exists.Post({
-      where: {
-        id: args.id,
-        author: {
-          id: userId,
-        }
+    const userId = getUserId(request)
+    const postExists = await prisma.exists.Post({
+      id: args.id,
+      author: {
+        id: userId
       }
     })
 
-    if (!exists) {
-      throw new Error("Unable to delete post")
+    if (!postExists) {
+      throw new Error('Unable to delete post')
     }
 
     return prisma.mutation.deletePost({
-        where: {
-          id: args.id
-        }
-      },
-      info
-    );
+      where: {
+        id: args.id
+      }
+    }, info)
   },
   async createComment(parent, args, {
     prisma,
